@@ -1,0 +1,47 @@
+{
+  consul: 'localhost:8500',
+  jobs: [
+    {
+      name: 'natsboard',
+      port: 3000,
+      exec: ['/usr/local/bin/manage.sh', 'onStart'],
+      health: {
+        exec: ['/usr/local/bin/manage.sh', 'health'],
+        interval: 2,
+        ttl: 5
+      },
+      restarts: 'unlimited'
+    },
+    {
+      name: 'consul-agent',
+      exec: ['/usr/local/bin/consul', 'agent',
+                  '-data-dir=/data',
+                  '-config-dir=/config',
+                  '-log-level=err',
+                  '-rejoin',
+                  '-retry-join', '{{ .CONSUL | default "consul" }}',
+                  '-retry-max', '10',
+                  '-retry-interval', '10s'],
+      restarts: 'unlimited'
+    },
+    {
+      name: 'onchange-nats',
+      exec: ['/usr/local/bin/manage.sh', 'onChange'],
+      when: {
+        source: 'watch.influxdb',
+        each: 'changed'
+      }
+    }
+  ],
+  watches: [
+    {
+      name: 'nats',
+      interval: 2
+    }
+  ],
+  telemetry: {
+    port: 9090,
+    interfaces: ['eth1', 'eth0', 'eth0[1]', 'lo', 'lo0', 'inet']
+  }
+}
+

@@ -26,8 +26,8 @@ RUN curl -Lso /tmp/consul-cli.tgz "https://github.com/CiscoCloud/consul-cli/rele
     && rm /tmp/consul-cli.tgz
 
 # Install ContainerPilot
-ENV CONTAINERPILOT_VERSION 3.0.0-dev.1
-RUN export CP_SHA1=bbeb4ed54d2e192fdd42d195fb3a0aa5726837b5 \
+ENV CONTAINERPILOT_VERSION 3.4.2
+RUN export CP_SHA1=5c99ae9ede01e8fcb9b027b5b3cb0cfd8c0b8b88 \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
@@ -38,10 +38,10 @@ RUN export CP_SHA1=bbeb4ed54d2e192fdd42d195fb3a0aa5726837b5 \
 COPY etc/* /etc/
 COPY bin/* /usr/local/bin/
 RUN chmod 500 /usr/local/bin/manage.sh
-ENV CONTAINERPILOT_PATH=/etc/containerpilot.json
+ENV CONTAINERPILOT_PATH=/etc/containerpilot.json5
 ENV CONTAINERPILOT=file://${CONTAINERPILOT_PATH}
 
 # Install our application
 RUN npm install -g natsboard
 
-CMD ["/bin/containerpilot"]
+CMD ["containerpilot"]
